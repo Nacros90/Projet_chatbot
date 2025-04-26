@@ -1,9 +1,12 @@
 # Dictionnaire des réponses du chatbot
 reponses = {
     "bonjour": "Bonjour à toi ! Comment puis-je t'aider ?",
+    "wesh": "Wesh ! Ça va ?",
+    "salut": "Salut ! Quoi de neuf ?",
     "aide": "Bien sûr, je peux t'aider. Que cherches-tu à faire ?",
     "merci": "Avec plaisir !",
     "au revoir": "À bientôt !"
+    "salut": "Salut à la prochaine !",
 }
 
 print("Chatbot : Salut ! Tape 'quit' pour quitter la conversation.")
