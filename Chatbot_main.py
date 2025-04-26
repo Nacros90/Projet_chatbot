@@ -5,7 +5,7 @@ reponses = {
     "salut": "Salut ! Quoi de neuf ?",
     "aide": "Bien sûr, je peux t'aider. Que cherches-tu à faire ?",
     "merci": "Avec plaisir !",
-    "au revoir": "À bientôt !"
+    "au revoir": "À bientôt !",
     "salut": "Salut à la prochaine !",
 }
 
