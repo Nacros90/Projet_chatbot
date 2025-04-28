@@ -24,7 +24,7 @@ while True:
 
     reponse = None
 
-    # Réponse spéciale pour les salutations
+    # Réponse spéciale pour les différente salutations
     if "bonjour" in utilisateur or "wesh" in utilisateur or "salut" in utilisateur:
         reponse = reponses.get(utilisateur, "Salut ! Comment ça va ?")  # On utilise get pour éviter l'erreur si la clé n'existe pas
         print(f"Chatbot : {reponse} {Nom} ?")
