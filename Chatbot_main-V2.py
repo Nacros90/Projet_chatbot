@@ -1,11 +1,12 @@
-# Définition de la classe Chatbot
+# Définition de la classe Chatbot pour encapsuler le comportement du chatbot
 class Chatbot:
     def __init__(self):  # Initialisation des attributs de la classe
         self.prenom = ""  # Stocke le prénom de l'utilisateur
         self.reponses = {  # Dictionnaire contenant des réponses prédéfinies
-            "aide": "Que puis-je faire pour toi, {prenom} ?",  # Réponse pour le mot-clé "aide"
-            "merci": "Avec plaisir, {prenom} !",  # Réponse pour le mot-clé "merci"
-            "au revoir": "À bientôt, {prenom} !"  # Réponse pour le mot-clé "au revoir"
+            "aide": "Que puis-je faire pour toi, {prenom} ?",
+            "merci": "Avec plaisir, {prenom} !",
+            "au revoir": "À bientôt, {prenom} !",
+            "bye": "Salut à la prochaine, {prenom} !"
         }
 
     def demander_prenom(self):  # Demande le prénom de l'utilisateur
@@ -19,6 +20,8 @@ class Chatbot:
         # Vérifie si le message contient "bonjour"
         if "bonjour" in message:
             return f"Bonjour {self.prenom} ! Content de te revoir."
+        elif "wesh" in message:  # Vérifie si le message contient "wesh"
+            return f"Wesh {self.prenom} ! Ça roule ?"
 
         # Parcourt les mots-clés dans le dictionnaire des réponses
         for mot_cle in self.reponses:
