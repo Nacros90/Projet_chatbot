@@ -23,6 +23,7 @@ class Chatbot:
                 "neutre": "Salut {prenom} !",
                 "content": "Salut {prenom} ! Comment ça va ?",
                 "enerve": "Qu'est-ce que tu veux encore ?"
+            },
         }
         self.mots_mechants = ["stupide", "idiot", "nul", "con"]  # Liste de mots considérés comme méchants
 
