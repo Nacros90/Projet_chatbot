@@ -2,37 +2,65 @@
 class Chatbot:
     def __init__(self):  # Initialisation des attributs de la classe
         self.prenom = ""  # Stocke le prénom de l'utilisateur
-        self.reponses = {  # Dictionnaire contenant des réponses prédéfinies
-            "aide": "Que puis-je faire pour toi, {prenom} ?",
-            "merci": "Avec plaisir, {prenom} !",
-            "au revoir": "À bientôt, {prenom} !",
-            "bye": "Salut à la prochaine, {prenom} !"
+        self.humeur = "neutre"  # Stocke l'humeur du chatbot
+        self.reponses = {  # Dictionnaire contenant des réponses prédéfinies et leurs variations selon l'humeur
+            "aide": {
+                "neutre" : "Que puis-je faire pour toi, {prenom} ?",
+                "content" : "Je suis là pour t'aider, {prenom}, dis-moi ce que je peut faire pour toi.",
+                "enerve": "Qu'est-ce que tu veux encore ..."
+            },
+            "merci": {
+                "neutre": "Avec plaisir, {prenom} !",
+                "content": "Oh, merci à toi aussi {prenom} ! Ça me fait plaisir !",
+                "enerve": "Ouais ouais, pas besoin d'en faire des tonnes..."
+            },
+            "au revoir" : {
+                "neutre": "À bientôt, {prenom} !",
+                "content": "Reviens vite me parler {prenom} !",
+                "enerve": "Enfin ! J'allais m'endormir..."
+            },
+            "salut": {
+                "neutre": "Salut {prenom} !",
+                "content": "Salut {prenom} ! Comment ça va ?",
+                "enerve": "Qu'est-ce que tu veux encore ?"
         }
+        self.mots_mechants = ["stupide", "idiot", "nul", "con"]  # Liste de mots considérés comme méchants
 
     def demander_prenom(self):  # Demande le prénom de l'utilisateur
         print("Chatbot : Salut ! Comment t'appelles-tu ?")
         self.prenom = input("Toi : ").capitalize()  # Récupère et capitalise le prénom
         print(f"Chatbot : Enchanté, {self.prenom} ! Tape 'quit' pour quitter la conversation.")
+    
+    def analyse_humeur(self, message):  # Analyse le message de l'utilisateur pour déterminer son humeur
+        for mot in self.mots_mechants:
+            if mot in message:
+                self.humeur = "enerve"
+                return  # Si un mot méchant est trouvé, l'humeur est mise à "enerve"
+        if "merci" in message:
+            self.humeur = "content"
 
     def obtenir_reponse(self, message):  # Analyse le message de l'utilisateur et retourne une réponse appropriée
         message = message.lower()  # Convertit le message en minuscules pour simplifier la recherche
+        self.analyse_humeur(message)  # Analyse l'humeur de l'utilisateur
         
         # Vérifie si le message contient "bonjour"
         if "bonjour" in message:
-            return f"Bonjour {self.prenom} ! Content de te revoir."
-        elif "wesh" in message:  # Vérifie si le message contient "wesh"
-            return f"Wesh {self.prenom} ! Ça roule ?"
+            salutation={
+                "neutre":f"Bonjour {self.prenom} !",
+                "content":f"Hello {self.prenom} ! Très content de te voir !",
+                "enerve":f"Qu'est-ce que tu veux encore {self.prenom} ?"
+            }
+            return salutation[self.humeur]  # Retourne la salutation appropriée selon l'humeur
 
         # Parcourt les mots-clés dans le dictionnaire des réponses
         for mot_cle in self.reponses:
             if mot_cle in message:  # Si un mot-clé est trouvé dans le message
-                return self.reponses[mot_cle].format(prenom=self.prenom)  # Retourne la réponse formatée
+                return self.reponses[mot_cle][self.humeur].format(prenom=self.prenom)  # Retourne la réponse formatée selon l'humeur
 
         # Si aucun mot-clé n'est trouvé, retourne une réponse par défaut
         return f"Hmm, je n'ai pas compris, {self.prenom}..."
 
     def discuter(self):  # Boucle principale pour interagir avec l'utilisateur
-        
         while True:
             utilisateur = input(f"{self.prenom} : ")  # Récupère le message de l'utilisateur
             if utilisateur.lower() == "quit":  # Si l'utilisateur tape "quit", on quitte la boucle
