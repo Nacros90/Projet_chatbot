@@ -1,0 +1,94 @@
+[
+    {
+        "auteur": "Chatbot",
+        "message": "Salut ! Comment t'appelles-tu ?"
+    },
+    {
+        "auteur": "Utilisateur",
+        "message": "Nael"
+    },
+    {
+        "auteur": "Chatbot",
+        "message": "Enchanté, Nael ! Tape 'quit' pour quitter la conversation."
+    },
+    {
+        "auteur": "Utilisateur",
+        "message": "Bonjour"
+    },
+    {
+        "auteur": "Chatbot",
+        "message": "Bonjour Nael !"
+    },
+    {
+        "auteur": "Utilisateur",
+        "message": "aide"
+    },
+    {
+        "auteur": "Chatbot",
+        "message": "Que puis-je faire pour toi, Nael ?"
+    },
+    {
+        "auteur": "Utilisateur",
+        "message": "idiot"
+    },
+    {
+        "auteur": "Chatbot",
+        "message": "Hmm, je n'ai pas compris, Nael..."
+    },
+    {
+        "auteur": "Utilisateur",
+        "message": "aid"
+    },
+    {
+        "auteur": "Chatbot",
+        "message": "Hmm, je n'ai pas compris, Nael..."
+    },
+    {
+        "auteur": "Utilisateur",
+        "message": "aide"
+    },
+    {
+        "auteur": "Chatbot",
+        "message": "Qu'est-ce que tu veux encore ..."
+    },
+    {
+        "auteur": "Utilisateur",
+        "message": "Bonjour"
+    },
+    {
+        "auteur": "Chatbot",
+        "message": "Qu'est-ce que tu veux encore Nael ?"
+    },
+    {
+        "auteur": "Utilisateur",
+        "message": "au revoir"
+    },
+    {
+        "auteur": "Chatbot",
+        "message": "Enfin ! J'allais m'endormir..."
+    },
+    {
+        "auteur": "Utilisateur",
+        "message": "merci"
+    },
+    {
+        "auteur": "Chatbot",
+        "message": "Oh, merci à toi aussi Nael ! Ça me fait plaisir !"
+    },
+    {
+        "auteur": "Utilisateur",
+        "message": "aide"
+    },
+    {
+        "auteur": "Chatbot",
+        "message": "Je suis là pour t'aider, Nael, dis-moi ce que je peut faire pour toi."
+    },
+    {
+        "auteur": "Utilisateur",
+        "message": "quit"
+    },
+    {
+        "auteur": "Chatbot",
+        "message": "Bye bye, Nael !"
+    }
+]
