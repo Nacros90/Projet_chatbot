@@ -33,12 +33,15 @@ class Chatbot:
         print(f"Chatbot : Enchanté, {self.prenom} ! Tape 'quit' pour quitter la conversation.")
     
     def analyse_humeur(self, message):  # Analyse le message de l'utilisateur pour déterminer son humeur
+        message = message.lower()  # Convertit le message en minuscules pour éviter les problèmes de casse
         for mot in self.mots_mechants:
             if mot in message:
                 self.humeur = "enerve"
-                return  # Si un mot méchant est trouvé, l'humeur est mise à "enerve"
+                print(f"Humeur changée à : {self.humeur}")  # Debug
+                return
         if "merci" in message:
             self.humeur = "content"
+            print(f"Humeur changée à : {self.humeur}")  # Debug
 
     def obtenir_reponse(self, message):  # Analyse le message de l'utilisateur et retourne une réponse appropriée
         message = message.lower()  # Convertit le message en minuscules pour simplifier la recherche
