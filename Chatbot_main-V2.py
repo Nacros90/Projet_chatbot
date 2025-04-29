@@ -30,6 +30,7 @@ class Chatbot:
             },
         }
         self.mots_mechants = ["stupide", "idiot", "nul", "con"]  # Liste de mots considérés comme méchants
+        self.mots_positifs = ["bien", "super", "génial", "cool","parfait"]  # Liste de mots considérés comme positifs
 
     def demander_prenom(self):  # Demande le prénom de l'utilisateur
         print("Chatbot : Salut ! Comment t'appelles-tu ?")
@@ -41,18 +42,15 @@ class Chatbot:
         self.historique.append({"auteur": "Utilisateur", "message": self.prenom})
         print(f"Chatbot : Enchanté, {self.prenom} ! Tape 'quit' pour quitter la conversation.")
         self.historique.append({"auteur": "Chatbot", "message": f"Enchanté, {self.prenom} ! Tape 'quit' pour quitter la conversation."})
-        # Enregistre l'historique de la conversation dans un fichier JSON
     
     def analyse_humeur(self, message):  # Analyse le message de l'utilisateur pour déterminer son humeur
         message = message.lower()  # Convertit le message en minuscules pour éviter les problèmes de casse
         for mot in self.mots_mechants:
             if mot in message:
                 self.humeur = "enerve"
-                print(f"Humeur changée à : {self.humeur}")  # Debug
                 return
         if "merci" in message:
             self.humeur = "content"
-            print(f"Humeur changée à : {self.humeur}")  # Debug
 
     def obtenir_reponse(self, message):  # Analyse le message de l'utilisateur et retourne une réponse appropriée
         message = message.lower()  # Convertit le message en minuscules pour simplifier la recherche
@@ -90,6 +88,7 @@ class Chatbot:
             reponse = self.obtenir_reponse(utilisateur)
             print("Chatbot :", reponse)
             self.historique.append({"auteur": "Chatbot", "message": reponse})
+
     def sauvegarder_historique(self):
         # Change le répertoire courant
         nouveau_repertoire = "E:/Naël/Python/Script/Projet_chatbot/historiques"
@@ -101,6 +100,29 @@ class Chatbot:
         with open(nom_fichier, "w", encoding="utf-8") as fichier:
             json.dump(self.historique, fichier, ensure_ascii=False, indent=4)
         print(f"\n[Info] Historique de la conversation sauvegardé dans le fichier {os.path.join(nouveau_repertoire, nom_fichier)}.")
+        
+    def analyser_conversation(self):  # Analyse l'historique de la conversation pour détecter les messages positifs et négatifs
+            positifs = 0
+            negatifs = 0
+
+            for entree in self.historique:
+                if entree["auteur"] == "Utilisateur":
+                    message = entree["message"].lower()
+                    if any(mot in message for mot in self.mots_positifs):
+                        positifs += 1
+                    if any(mot in message for mot in self.mots_méchants):
+                        negatifs += 1
+
+            print("\n--- Analyse de la conversation ---")
+            print(f"Messages positifs détectés : {positifs}")
+            print(f"Messages négatifs détectés : {negatifs}")
+
+            if positifs > negatifs:
+                print("Conclusion : Conversation globalement POSITIVE")
+            elif negatifs > positifs:
+                print("Conclusion : Conversation plutôt NEGATIVE")
+            else:
+                print("Conclusion : Conversation NEUTRE ou équilibrée")
 
 # --- Partie principale du programme ---
 if __name__ == "__main__":  # Instancie un objet Chatbot et démarre la conversation
