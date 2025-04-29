@@ -123,7 +123,7 @@ class Chatbot:
                 if entree["auteur"] == "Utilisateur":
                     message = entree["message"].lower()
 
-                    #Vérification simple dur mots isolés
+                    #Vérification simple de mots isolés
                     if any(mot in message for mot in self.mots_positifs):
                         positifs += 1
                     if any(mot in message for mot in self.mots_mechants):
