@@ -5,11 +5,11 @@
     },
     {
         "auteur": "Utilisateur",
-        "message": "Nael"
+        "message": "Ne"
     },
     {
         "auteur": "Chatbot",
-        "message": "Enchanté, Nael ! Tape 'quit' pour quitter la conversation."
+        "message": "Enchanté, Ne ! Tape 'quit' pour quitter la conversation."
     },
     {
         "auteur": "Utilisateur",
@@ -17,15 +17,7 @@
     },
     {
         "auteur": "Chatbot",
-        "message": "Bonjour Nael !"
-    },
-    {
-        "auteur": "Utilisateur",
-        "message": "bien"
-    },
-    {
-        "auteur": "Chatbot",
-        "message": "Hmm, je n'ai pas compris, Nael..."
+        "message": "Bonjour Ne !"
     },
     {
         "auteur": "Utilisateur",
@@ -33,7 +25,15 @@
     },
     {
         "auteur": "Chatbot",
-        "message": "Hmm, je n'ai pas compris, Nael..."
+        "message": "Hmm, je n'ai pas compris, Ne..."
+    },
+    {
+        "auteur": "Utilisateur",
+        "message": "bonjour"
+    },
+    {
+        "auteur": "Chatbot",
+        "message": "Qu'est-ce que tu veux encore Ne ?"
     },
     {
         "auteur": "Utilisateur",
@@ -49,7 +49,7 @@
     },
     {
         "auteur": "Chatbot",
-        "message": "Oh, merci à toi aussi Nael ! Ça me fait plaisir !"
+        "message": "Oh, merci à toi aussi Ne ! Ça me fait plaisir !"
     },
     {
         "auteur": "Utilisateur",
@@ -57,15 +57,15 @@
     },
     {
         "auteur": "Chatbot",
-        "message": "Hmm, je n'ai pas compris, Nael..."
+        "message": "Hmm, je n'ai pas compris, Ne..."
     },
     {
         "auteur": "Utilisateur",
-        "message": "génial même"
+        "message": "génial"
     },
     {
         "auteur": "Chatbot",
-        "message": "Hmm, je n'ai pas compris, Nael..."
+        "message": "Hmm, je n'ai pas compris, Ne..."
     },
     {
         "auteur": "Utilisateur",
@@ -73,7 +73,7 @@
     },
     {
         "auteur": "Chatbot",
-        "message": "Reviens vite me parler Nael !"
+        "message": "Reviens vite me parler Ne !"
     },
     {
         "auteur": "Utilisateur",
@@ -81,6 +81,6 @@
     },
     {
         "auteur": "Chatbot",
-        "message": "Bye bye, Nael !"
+        "message": "Bye bye, Ne !"
     }
 ]

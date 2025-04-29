@@ -110,7 +110,7 @@ class Chatbot:
                     message = entree["message"].lower()
                     if any(mot in message for mot in self.mots_positifs):
                         positifs += 1
-                    if any(mot in message for mot in self.mots_méchants):
+                    if any(mot in message for mot in self.mots_mechants):
                         negatifs += 1
 
             print("\n--- Analyse de la conversation ---")
@@ -129,3 +129,4 @@ if __name__ == "__main__":  # Instancie un objet Chatbot et démarre la conversa
     bot = Chatbot()
     bot.demander_prenom()  # Demande le prénom de l'utilisateur
     bot.discuter()  # Démarre la conversation
+    bot.analyser_conversation()  # Analyse l'historique de la conversation
