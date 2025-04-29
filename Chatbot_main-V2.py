@@ -31,6 +31,20 @@ class Chatbot:
         }
         self.mots_mechants = ["stupide", "idiot", "nul", "con"]  # Liste de mots considérés comme méchants
         self.mots_positifs = ["bien", "super", "génial", "cool","parfait"]  # Liste de mots considérés comme positifs
+        self.motifs_positifs = [  # Liste de motifs positifs pour la réponse
+            ["je suis","content"],
+            ["je me sens","bien"],
+            ["c'est","super"],
+            ["c'est","génial"],
+            ["je suis","heureux"]
+        ]
+        self.motifs_negatifs = [  # Liste de motifs négatifs pour la réponse
+            ["je suis","triste"],
+            ["je me sens","mal"],
+            ["c'est","nul"],
+            ["c'est","pourri"],
+            ["je suis","déçu"]
+        ]
 
     def demander_prenom(self):  # Demande le prénom de l'utilisateur
         print("Chatbot : Salut ! Comment t'appelles-tu ?")
@@ -108,10 +122,23 @@ class Chatbot:
             for entree in self.historique:
                 if entree["auteur"] == "Utilisateur":
                     message = entree["message"].lower()
+
+                    #Vérification simple dur mots isolés
                     if any(mot in message for mot in self.mots_positifs):
                         positifs += 1
                     if any(mot in message for mot in self.mots_mechants):
                         negatifs += 1
+
+                    #Vérification de motifs complexes
+                    for motif in self.motifs_positifs:
+                        if all(mot in message for mot in motif):
+                            positifs += 1
+                            break #Evite de compter plusieurs fois le même message
+                    
+                    for motif in self.motifs_negatifs:
+                        if all(mot in message for mot in motif):
+                            negatifs += 1
+                            break #Evite de compter plusieurs fois le même message
 
             print("\n--- Analyse de la conversation ---")
             print(f"Messages positifs détectés : {positifs}")
