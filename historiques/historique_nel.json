@@ -1,0 +1,22 @@
+[
+    {
+        "auteur": "Chatbot",
+        "message": "Salut ! Comment t'appelles-tu ?"
+    },
+    {
+        "auteur": "Utilisateur",
+        "message": "Nel"
+    },
+    {
+        "auteur": "Chatbot",
+        "message": "Enchanté, Nel ! Tape 'quit' pour quitter la conversation."
+    },
+    {
+        "auteur": "Utilisateur",
+        "message": "quit"
+    },
+    {
+        "auteur": "Chatbot",
+        "message": "Bye bye, Nel !"
+    }
+]

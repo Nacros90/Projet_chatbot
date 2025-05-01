@@ -32,18 +32,19 @@ class Chatbot:
         self.mots_mechants = ["stupide", "idiot", "nul", "con"]  # Liste de mots considérés comme méchants
         self.mots_positifs = ["bien", "super", "génial", "cool","parfait"]  # Liste de mots considérés comme positifs
         self.motifs_positifs = [  # Liste de motifs positifs pour la réponse
-            ["je suis","content"],
-            ["je me sens","bien"],
-            ["c'est","super"],
-            ["c'est","génial"],
-            ["je suis","heureux"]
+            (["je suis","content"],1),
+            (["je me sens","bien"],1),
+            (["je me sens super","bien"],2),
+            (["c'est","super"],2),
+            (["c'est","génial"],2),
+            (["je suis","heureux"],1)
         ]
         self.motifs_negatifs = [  # Liste de motifs négatifs pour la réponse
-            ["je suis","triste"],
-            ["je me sens","mal"],
-            ["c'est","nul"],
-            ["c'est","pourri"],
-            ["je suis","déçu"]
+            (["je suis","triste"],1),
+            (["je me sens","mal"],2),
+            (["c'est","nul"],2),
+            (["c'est","pourri"],1),
+            (["je suis","déçu"],1),
         ]
 
     def demander_prenom(self):  # Demande le prénom de l'utilisateur
@@ -130,14 +131,14 @@ class Chatbot:
                         negatifs += 1
 
                     #Vérification de motifs complexes
-                    for motif in self.motifs_positifs:
+                    for motif,poids in self.motifs_positifs:
                         if all(mot in message for mot in motif):
-                            positifs += 1
+                            positifs += poids
                             break #Evite de compter plusieurs fois le même message
                     
-                    for motif in self.motifs_negatifs:
+                    for motif,poids in self.motifs_negatifs:
                         if all(mot in message for mot in motif):
-                            negatifs += 1
+                            negatifs += poids
                             break #Evite de compter plusieurs fois le même message
 
             print("\n--- Analyse de la conversation ---")
