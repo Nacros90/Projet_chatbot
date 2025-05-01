@@ -3,6 +3,8 @@ import os
 from datetime import datetime
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
+from textblob import Blobber
+from textblob_fr import PatternTagger, PatternAnalyzer
 
 # Définition de la classe Chatbot pour encapsuler le comportement du chatbot
 class Chatbot:
@@ -51,6 +53,7 @@ class Chatbot:
             (["je suis","déçu"],1),
         ]
         self.mots_negation=["pas", "ne", "aucun", "jamais","rien"]  # Liste de mots de négation
+        self.tb=Blobber(pos_tagger=PatternTagger(), analyzer=PatternAnalyzer())  # Instancie l'analyseur de sentiment TextBlob pour le français
 
     def get_timestamp(self):  # Retourne l'heure actuelle au format "YYYY-MM-DD HH:MM:SS"
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -204,6 +207,36 @@ class Chatbot:
                 "auteur": "Chatbot",
                 "message": ton
                 })
+    
+    def analyser_conversation_textblob(self):
+        score_total = 0
+        nb_messages = 0
+
+        for message in self.historique:
+            if message["auteur"] == "Utilisateur":
+                blob = self.tb(message["message"])
+                score_total += blob.sentiment[0]  # Utilise TextBlob pour obtenir le score de sentiment
+                nb_messages += 1
+        
+        if nb_messages == 0:
+            ton = "Aucun message à analyser."
+        else:
+            moyenne = score_total / nb_messages
+            if moyenne > 0.3:
+                ton = "Ton positif (TextBlob)"
+            elif moyenne < -0.3:
+                ton = "Ton négatif (TextBlob)"
+            else:
+                ton = "Ton neutre ou incertain (TextBlob)"
+        
+        self.historique.append({
+            "timestamp": self.get_timestamp(),
+            "auteur": "Bot",
+            "message": ton,
+            })
+        self.sauvegarder_historique()
+        print(ton)
+
     def analyser_conversation_nlp(self):
         score_total = 0
         nb_messages = 0
@@ -240,5 +273,6 @@ if __name__ == "__main__":  # Instancie un objet Chatbot et démarre la conversa
     bot.demander_prenom()  # Demande le prénom de l'utilisateur
     bot.discuter()  # Démarre la conversation
     bot.analyser_conversation()  # Analyse l'historique de la conversation
-    bot.analyser_conversation_nlp()  # Analyse l'historique de la conversation avec NLP
+    bot.analyser_conversation_textblob()  # Analyse l'historique de la conversation avec TextBlob
+#    bot.analyser_conversation_nlp()  # Analyse l'historique de la conversation avec NLP, fonctionne que en englais
     bot.sauvegarder_historique()  # Sauvegarde l'historique de la conversation dans un fichier JSON
