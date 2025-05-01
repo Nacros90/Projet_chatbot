@@ -1,6 +1,8 @@
 import json
 import os
 from datetime import datetime
+import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
 
 # Définition de la classe Chatbot pour encapsuler le comportement du chatbot
 class Chatbot:
@@ -8,6 +10,7 @@ class Chatbot:
         self.prenom = ""  # Stocke le prénom de l'utilisateur
         self.humeur = "neutre"  # Stocke l'humeur du chatbot
         self.historique=[]
+        self.sia=SentimentIntensityAnalyzer()  # Instancie l'analyseur de sentiment VADER
         self.reponses = {  # Dictionnaire contenant des réponses prédéfinies et leurs variations selon l'humeur
             "aide": {
                 "neutre" : "Que puis-je faire pour toi, {prenom} ?",
@@ -201,6 +204,35 @@ class Chatbot:
                 "auteur": "Chatbot",
                 "message": ton
                 })
+    def analyser_conversation_nlp(self):
+        score_total = 0
+        nb_messages = 0
+
+        for message in self.historique:
+            if message["auteur"] == "Utilisateur":
+                s = self.sia.polarity_scores(message["message"])
+                score_total += s["compound"]
+                nb_messages += 1
+
+        if nb_messages == 0:
+            ton = "Aucun message à analyser."
+        else:
+            moyenne = score_total / nb_messages
+            if moyenne > 0.3:
+                ton = "Ton positif (NLP)"
+            elif moyenne < -0.3:
+                ton = "Ton négatif (NLP)"
+            else:
+                ton = "Ton neutre ou incertain (NLP)"
+
+        self.historique.append({
+            "auteur": "Bot",
+            "message": ton,
+            "timestamp": self.get_timestamp()
+        })
+        self.sauvegarder_historique()
+        print(ton)
+
 
 # --- Partie principale du programme ---
 if __name__ == "__main__":  # Instancie un objet Chatbot et démarre la conversation
@@ -208,4 +240,5 @@ if __name__ == "__main__":  # Instancie un objet Chatbot et démarre la conversa
     bot.demander_prenom()  # Demande le prénom de l'utilisateur
     bot.discuter()  # Démarre la conversation
     bot.analyser_conversation()  # Analyse l'historique de la conversation
+    bot.analyser_conversation_nlp()  # Analyse l'historique de la conversation avec NLP
     bot.sauvegarder_historique()  # Sauvegarde l'historique de la conversation dans un fichier JSON
