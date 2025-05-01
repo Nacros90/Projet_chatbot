@@ -230,7 +230,7 @@ class Chatbot:
             "message": ton,
             "timestamp": self.get_timestamp()
         })
-        self.sauvegarder_historique()
+        self.sauvegarder_historique()   #Je pense que cette ligne n'est pas nécessaire ici, mais je la laisse pour l'instant
         print(ton)
 
 
