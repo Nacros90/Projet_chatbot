@@ -1,10 +1,14 @@
 import json
 import os
 from datetime import datetime
+''''
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 from textblob import Blobber
 from textblob_fr import PatternTagger, PatternAnalyzer
+'''
+from flair.models import TextClassifier
+from flair.data import Sentence
 
 # Définition de la classe Chatbot pour encapsuler le comportement du chatbot
 class Chatbot:
@@ -12,7 +16,7 @@ class Chatbot:
         self.prenom = ""  # Stocke le prénom de l'utilisateur
         self.humeur = "neutre"  # Stocke l'humeur du chatbot
         self.historique=[]
-        self.sia=SentimentIntensityAnalyzer()  # Instancie l'analyseur de sentiment VADER
+        #self.sia=SentimentIntensityAnalyzer()  # Instancie l'analyseur de sentiment VADER
         self.reponses = {  # Dictionnaire contenant des réponses prédéfinies et leurs variations selon l'humeur
             "aide": {
                 "neutre" : "Que puis-je faire pour toi, {prenom} ?",
@@ -53,7 +57,8 @@ class Chatbot:
             (["je suis","déçu"],1),
         ]
         self.mots_negation=["pas", "ne", "aucun", "jamais","rien"]  # Liste de mots de négation
-        self.tb=Blobber(pos_tagger=PatternTagger(), analyzer=PatternAnalyzer())  # Instancie l'analyseur de sentiment TextBlob pour le français
+        #self.tb=Blobber(pos_tagger=PatternTagger(), analyzer=PatternAnalyzer())  # Instancie l'analyseur de sentiment TextBlob pour le français
+        self.classifier = TextClassifier.load('sentiment-multi-fast')  # Instancie le classificateur de sentiment de Flair
 
     def get_timestamp(self):  # Retourne l'heure actuelle au format "YYYY-MM-DD HH:MM:SS"
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -207,27 +212,31 @@ class Chatbot:
                 "auteur": "Chatbot",
                 "message": ton
                 })
-    
-    def analyser_conversation_textblob(self):
-        score_total = 0
+
+    def analyser_conversation_flair(self):  # Analyse l'historique de la conversation avec Flair
+        pos_count, neg_count = 0, 0
         nb_messages = 0
 
         for message in self.historique:
             if message["auteur"] == "Utilisateur":
-                blob = self.tb(message["message"])
-                score_total += blob.sentiment[0]  # Utilise TextBlob pour obtenir le score de sentiment
+                sentence = Sentence(message["message"])
+                self.classifier.predict(sentence)
+                label = sentence.labels[0].value  # Récupère le label de sentiment
+                if label == "POSITIVE":
+                    pos_count += 1
+                elif label == "NEGATIVE":
+                    neg_count += 1
                 nb_messages += 1
         
         if nb_messages == 0:
             ton = "Aucun message à analyser."
         else:
-            moyenne = score_total / nb_messages
-            if moyenne > 0.3:
-                ton = "Ton positif (TextBlob)"
-            elif moyenne < -0.3:
-                ton = "Ton négatif (TextBlob)"
+            if pos_count/nb_messages > 0.6:
+                ton = "Ton positif (Flair)"
+            elif neg_count/nb_messages > 0.6:
+                ton = "Ton négatif (Flair)"
             else:
-                ton = "Ton neutre ou incertain (TextBlob)"
+                ton = "Ton neutre ou incertain (Flair)"
         
         self.historique.append({
             "timestamp": self.get_timestamp(),
@@ -237,6 +246,7 @@ class Chatbot:
         self.sauvegarder_historique()
         print(ton)
 
+''' #Analyse l'historique de la conversation avec NLP (VADER)
     def analyser_conversation_nlp(self):
         score_total = 0
         nb_messages = 0
@@ -265,7 +275,38 @@ class Chatbot:
         })
         self.sauvegarder_historique()   #Je pense que cette ligne n'est pas nécessaire ici, mais je la laisse pour l'instant
         print(ton)
+'''
+''' #Analyse l'historique de la conversation avec TextBlob
+    def analyser_conversation_textblob(self):
+        score_total = 0
+        nb_messages = 0
 
+        for message in self.historique:
+            if message["auteur"] == "Utilisateur":
+                blob = self.tb(message["message"])
+                score_total += blob.sentiment[0]  # Utilise TextBlob pour obtenir le score de sentiment
+                nb_messages += 1
+        
+        if nb_messages == 0:
+            ton = "Aucun message à analyser."
+        else:
+            moyenne = score_total / nb_messages
+            if moyenne > 0.3:
+                ton = "Ton positif (TextBlob)"
+            elif moyenne < -0.3:
+                ton = "Ton négatif (TextBlob)"
+            else:
+                ton = "Ton neutre ou incertain (TextBlob)"
+        
+        self.historique.append({
+            "timestamp": self.get_timestamp(),
+            "auteur": "Bot",
+            "message": ton,
+            })
+        self.sauvegarder_historique()
+        print(ton)
+'''
+    
 
 # --- Partie principale du programme ---
 if __name__ == "__main__":  # Instancie un objet Chatbot et démarre la conversation
@@ -273,6 +314,7 @@ if __name__ == "__main__":  # Instancie un objet Chatbot et démarre la conversa
     bot.demander_prenom()  # Demande le prénom de l'utilisateur
     bot.discuter()  # Démarre la conversation
     bot.analyser_conversation()  # Analyse l'historique de la conversation
-    bot.analyser_conversation_textblob()  # Analyse l'historique de la conversation avec TextBlob
-#    bot.analyser_conversation_nlp()  # Analyse l'historique de la conversation avec NLP, fonctionne que en englais
+    #bot.analyser_conversation_nlp()  # Analyse l'historique de la conversation avec NLP, fonctionne que en anglais
+    #bot.analyser_conversation_textblob()  # Analyse l'historique de la conversation avec TextBlob
+    bot.analyser_conversation_flair()  # Analyse l'historique de la conversation avec Flair
     bot.sauvegarder_historique()  # Sauvegarde l'historique de la conversation dans un fichier JSON
