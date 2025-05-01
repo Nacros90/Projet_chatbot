@@ -46,6 +46,7 @@ class Chatbot:
             (["c'est","pourri"],1),
             (["je suis","déçu"],1),
         ]
+        self.mots_negation=["pas", "ne", "aucun", "jamais","rien"]  # Liste de mots de négation
 
     def demander_prenom(self):  # Demande le prénom de l'utilisateur
         print("Chatbot : Salut ! Comment t'appelles-tu ?")
@@ -115,7 +116,10 @@ class Chatbot:
         with open(nom_fichier, "w", encoding="utf-8") as fichier:
             json.dump(self.historique, fichier, ensure_ascii=False, indent=4)
         print(f"\n[Info] Historique de la conversation sauvegardé dans le fichier {os.path.join(nouveau_repertoire, nom_fichier)}.")
-        
+
+    def contient_negation(self, message):  # Vérifie si le message contient des mots de négation
+        return any(neg in message for neg in self.mots_negation)
+
     def analyser_conversation(self):  # Analyse l'historique de la conversation pour détecter les messages positifs et négatifs
             positifs = 0
             negatifs = 0
@@ -123,34 +127,52 @@ class Chatbot:
             for entree in self.historique:
                 if entree["auteur"] == "Utilisateur":
                     message = entree["message"].lower()
+                    negation=self.contient_negation(message)  # Vérifie si le message contient des mots de négation
 
                     #Vérification simple de mots isolés
-                    if any(mot in message for mot in self.mots_positifs):
-                        positifs += 1
-                    if any(mot in message for mot in self.mots_mechants):
-                        negatifs += 1
+                    for mot in self.mots_positifs:
+                        if mot in message:
+                            if negation:
+                                negatifs += 1
+                            else:
+                                positifs += 1
+                    
+                    for mot in self.mots_mechants:
+                        if mot in message:
+                            negatifs += 1
 
-                    #Vérification de motifs complexes
-                    for motif,poids in self.motifs_positifs:
+                    #Vérification de motifs complexes avec poids
+                    for motif,poids in self.motifs_positifs:  #motifs positifs
                         if all(mot in message for mot in motif):
-                            positifs += poids
+                            if negation:
+                                negatifs += poids
+                            else:
+                                positifs += poids
                             break #Evite de compter plusieurs fois le même message
                     
-                    for motif,poids in self.motifs_negatifs:
+                    for motif,poids in self.motifs_negatifs:  #motifs négatifs
                         if all(mot in message for mot in motif):
                             negatifs += poids
-                            break #Evite de compter plusieurs fois le même message
+                            break
 
             print("\n--- Analyse de la conversation ---")
             print(f"Messages positifs détectés : {positifs}")
             print(f"Messages négatifs détectés : {negatifs}")
 
             if positifs > negatifs:
-                print("Conclusion : Conversation globalement POSITIVE")
+                ton="Conclusion : Conversation globalement POSITIVE"
+                print(ton)
             elif negatifs > positifs:
-                print("Conclusion : Conversation plutôt NEGATIVE")
+                ton="Conclusion : Conversation plutôt NEGATIVE"
+                print(ton)
             else:
-                print("Conclusion : Conversation NEUTRE ou équilibrée")
+                ton="Conclusion : Conversation NEUTRE ou équilibrée"
+                print(ton)
+                        
+            self.historique.append({
+                "auteur": "Chatbot",
+                "message": ton
+                })
 
 # --- Partie principale du programme ---
 if __name__ == "__main__":  # Instancie un objet Chatbot et démarre la conversation
