@@ -97,7 +97,6 @@ class Chatbot:
             if utilisateur.lower() == "quit":  # Si l'utilisateur tape "quit", on quitte la boucle
                 print(f"Chatbot : Bye bye, {self.prenom} !")
                 self.historique.append({"auteur": "Chatbot", "message": f"Bye bye, {self.prenom} !"})
-                self.sauvegarder_historique()
                 break
 
             # Obtient une réponse du chatbot et l'affiche
@@ -180,3 +179,4 @@ if __name__ == "__main__":  # Instancie un objet Chatbot et démarre la conversa
     bot.demander_prenom()  # Demande le prénom de l'utilisateur
     bot.discuter()  # Démarre la conversation
     bot.analyser_conversation()  # Analyse l'historique de la conversation
+    bot.sauvegarder_historique()  # Sauvegarde l'historique de la conversation dans un fichier JSON
