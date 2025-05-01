@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 # Définition de la classe Chatbot pour encapsuler le comportement du chatbot
 class Chatbot:
@@ -48,16 +49,31 @@ class Chatbot:
         ]
         self.mots_negation=["pas", "ne", "aucun", "jamais","rien"]  # Liste de mots de négation
 
+    def get_timestamp(self):  # Retourne l'heure actuelle au format "YYYY-MM-DD HH:MM:SS"
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     def demander_prenom(self):  # Demande le prénom de l'utilisateur
         print("Chatbot : Salut ! Comment t'appelles-tu ?")
         self.prenom = input("Toi : ").capitalize()  # Récupère et capitalise le prénom
         if self.prenom.lower() == "quit":  # Si l'utilisateur tape "quit", on quitte le programme
             print("Chatbot : Bye bye !")
             exit()
-        self.historique.append({"auteur": "Chatbot", "message":"Salut ! Comment t'appelles-tu ?"})
-        self.historique.append({"auteur": "Utilisateur", "message": self.prenom})
+        self.historique.append({
+            "timestamp": self.get_timestamp(),
+            "auteur": "Chatbot",
+            "message":"Salut ! Comment t'appelles-tu ?"
+            })
+        self.historique.append({
+            "timestamp": self.get_timestamp(),
+            "auteur": "Utilisateur",
+            "message": self.prenom,
+            })
         print(f"Chatbot : Enchanté, {self.prenom} ! Tape 'quit' pour quitter la conversation.")
-        self.historique.append({"auteur": "Chatbot", "message": f"Enchanté, {self.prenom} ! Tape 'quit' pour quitter la conversation."})
+        self.historique.append({
+            "timestamp": self.get_timestamp(),
+            "auteur": "Chatbot",
+            "message": f"Enchanté, {self.prenom} ! Tape 'quit' pour quitter la conversation."
+            })
     
     def analyse_humeur(self, message):  # Analyse le message de l'utilisateur pour déterminer son humeur
         message = message.lower()  # Convertit le message en minuscules pour éviter les problèmes de casse
@@ -92,17 +108,29 @@ class Chatbot:
     def discuter(self):  # Boucle principale pour interagir avec l'utilisateur
         while True:
             utilisateur = input(f"{self.prenom} : ")  # Récupère le message de l'utilisateur
-            self.historique.append({"auteur": "Utilisateur", "message": utilisateur})  # Enregistre le message de l'utilisateur dans l'historique
+            self.historique.append({  # Enregistre le message de l'utilisateur dans l'historique
+                "timestamp": self.get_timestamp(),
+                "auteur": "Utilisateur",
+                "message": utilisateur
+                })
 
             if utilisateur.lower() == "quit":  # Si l'utilisateur tape "quit", on quitte la boucle
                 print(f"Chatbot : Bye bye, {self.prenom} !")
-                self.historique.append({"auteur": "Chatbot", "message": f"Bye bye, {self.prenom} !"})
+                self.historique.append({
+                    "timestamp": self.get_timestamp(),
+                    "auteur": "Chatbot",
+                    "message": f"Bye bye, {self.prenom} !"
+                    })
                 break
 
             # Obtient une réponse du chatbot et l'affiche
             reponse = self.obtenir_reponse(utilisateur)
             print("Chatbot :", reponse)
-            self.historique.append({"auteur": "Chatbot", "message": reponse})
+            self.historique.append({
+                "timestamp": self.get_timestamp(),
+                "auteur": "Chatbot",
+                "message": reponse
+                })
 
     def sauvegarder_historique(self):
         # Change le répertoire courant
@@ -169,6 +197,7 @@ class Chatbot:
                 print(ton)
                         
             self.historique.append({
+                "timestamp": self.get_timestamp(),
                 "auteur": "Chatbot",
                 "message": ton
                 })
