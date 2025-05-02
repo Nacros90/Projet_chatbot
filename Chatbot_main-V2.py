@@ -6,9 +6,12 @@ import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 from textblob import Blobber
 from textblob_fr import PatternTagger, PatternAnalyzer
-'''
 from flair.models import TextClassifier
 from flair.data import Sentence
+'''
+#TextClassifier.load('sentiment-multi-fast') # Instancie le classificateur de sentiment de Flair
+from transformers import pipeline  # Importe la bibliothèque Transformers pour le traitement du langage naturel
+import torch  # Importe PyTorch, une bibliothèque de calcul scientifique
 
 # Définition de la classe Chatbot pour encapsuler le comportement du chatbot
 class Chatbot:
@@ -58,7 +61,8 @@ class Chatbot:
         ]
         self.mots_negation=["pas", "ne", "aucun", "jamais","rien"]  # Liste de mots de négation
         #self.tb=Blobber(pos_tagger=PatternTagger(), analyzer=PatternAnalyzer())  # Instancie l'analyseur de sentiment TextBlob pour le français
-        self.classifier = TextClassifier.load('sentiment-multi-fast')  # Instancie le classificateur de sentiment de Flair
+        #self.classifier = TextClassifier.load('sentiment-multi-fast')  # Instancie le classificateur de sentiment de Flair
+        self.sentiment_pipeline = pipeline("sentiment-analysis", model="nlptown/bert-base-multilingual-uncased-sentiment", device=0 if torch.cuda.is_available() else -1)  # Instancie le pipeline de sentiment multilingue de Transformers
 
     def get_timestamp(self):  # Retourne l'heure actuelle au format "YYYY-MM-DD HH:MM:SS"
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -213,6 +217,45 @@ class Chatbot:
                 "message": ton
                 })
 
+    def analyser_conversation_transformers(self):  # Analyse l'historique de la conversation avec le modèle Transformers
+        user_messages=[m["message"] for m in self.historique if m["auteur"]=="Utilisateur"]  #filtre les messages de l'utilisateur
+
+        if not user_messages:
+            ton = "Aucun message utilisateur à analyser."
+        else:  #découpe en petits batches pour éviter les erreurs de mémoire
+            batch_size = 16  # Taille du batch
+            scores = []  # Liste pour stocker les scores de sentiment
+
+            for i in range(0, len(user_messages), batch_size):
+                batch = user_messages[i:i + batch_size]
+                results = self.sentiment_pipeline(batch)  # Applique le pipeline de sentiment sur le batch
+
+                for res in results:
+                    score = int(res["label"][0])  # Récupère le score de sentiment
+                    scores.append(score)  # Ajoute le score à la liste
+            
+            moyenne = sum(scores) / len(scores)  # Calcule la moyenne des scores
+            if moyenne >= 4:
+                ton = "Ton globalement positif (Transformers)"
+            elif moyenne <= 2:
+                ton = "Ton globalement négatif (Transformers)"
+            else:
+                ton = "Ton globalement neutre ou incertain (Transformers)"
+        
+        self.historique.append({
+            "timestamp": self.get_timestamp(),
+            "auteur": "Bot",
+            "message": ton,
+            })
+        
+        #Libération de la mémoire GPU si utilisée
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        
+        self.sauvegarder_historique()  # Sauvegarde l'historique de la conversation dans un fichier JSON
+        print(ton)  # Affiche le ton de la conversation
+
+''' #Analyse l'historique de la conversation avec Flair
     def analyser_conversation_flair(self):  # Analyse l'historique de la conversation avec Flair
         pos_count, neg_count = 0, 0
         nb_messages = 0
@@ -245,7 +288,7 @@ class Chatbot:
             })
         self.sauvegarder_historique()
         print(ton)
-
+'''
 ''' #Analyse l'historique de la conversation avec NLP (VADER)
     def analyser_conversation_nlp(self):
         score_total = 0
@@ -316,5 +359,6 @@ if __name__ == "__main__":  # Instancie un objet Chatbot et démarre la conversa
     bot.analyser_conversation()  # Analyse l'historique de la conversation
     #bot.analyser_conversation_nlp()  # Analyse l'historique de la conversation avec NLP, fonctionne que en anglais
     #bot.analyser_conversation_textblob()  # Analyse l'historique de la conversation avec TextBlob
-    bot.analyser_conversation_flair()  # Analyse l'historique de la conversation avec Flair
+    #bot.analyser_conversation_flair()  # Analyse l'historique de la conversation avec Flair
+    bot.analyser_conversation_transformers()  # Analyse l'historique de la conversation avec Transformers
     bot.sauvegarder_historique()  # Sauvegarde l'historique de la conversation dans un fichier JSON
