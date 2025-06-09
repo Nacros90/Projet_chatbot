@@ -13,6 +13,7 @@ from flair.data import Sentence
 from transformers import pipeline  # Importe la bibliothèque Transformers pour le traitement du langage naturel
 import torch  # Importe PyTorch, une bibliothèque de calcul scientifique
 
+#print("Chatbot version 2.0")
 # Définition de la classe Chatbot pour encapsuler le comportement du chatbot
 class Chatbot:
     def __init__(self):  # Initialisation des attributs de la classe
