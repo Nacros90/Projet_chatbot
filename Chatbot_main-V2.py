@@ -1,6 +1,5 @@
-import json
-import os
 from datetime import datetime
+import Save_logs  # Importe le module Save_logs pour la sauvegarde de l'historique
 ''''
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
@@ -148,17 +147,8 @@ class Chatbot:
                 "message": reponse
                 })
 
-    def sauvegarder_historique(self):
-        # Change le répertoire courant
-        nouveau_repertoire = "E:/Naël/Python/Script/Projet_chatbot/historiques"
-        os.makedirs(nouveau_repertoire, exist_ok=True)  # Crée le répertoire s'il n'existe pas
-        os.chdir(nouveau_repertoire)  # Change le répertoire courant
-
-        # Sauvegarde l'historique dans le nouveau répertoire
-        nom_fichier = f"historique_{self.prenom.lower()}.json"
-        with open(nom_fichier, "w", encoding="utf-8") as fichier:
-            json.dump(self.historique, fichier, ensure_ascii=False, indent=4)
-        print(f"\n[Info] Historique de la conversation sauvegardé dans le fichier {os.path.join(nouveau_repertoire, nom_fichier)}.")
+    def sauvegarder_historique(self):  # Sauvegarde l'historique de la conversation dans un fichier JSON
+        Save_logs.sauvegarder_historique(self)
 
     def contient_negation(self, message):  # Vérifie si le message contient des mots de négation
         return any(neg in message for neg in self.mots_negation)
@@ -214,7 +204,7 @@ class Chatbot:
                         
             self.historique.append({
                 "timestamp": self.get_timestamp(),
-                "auteur": "Chatbot",
+                "auteur": "Analyse_conv",
                 "message": ton
                 })
 
@@ -245,15 +235,13 @@ class Chatbot:
         
         self.historique.append({
             "timestamp": self.get_timestamp(),
-            "auteur": "Bot",
+            "auteur": "Tranformers_conv_analyse",
             "message": ton,
             })
         
         #Libération de la mémoire GPU si utilisée
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
-        
-        self.sauvegarder_historique()  # Sauvegarde l'historique de la conversation dans un fichier JSON
         print(ton)  # Affiche le ton de la conversation
 
 ''' #Analyse l'historique de la conversation avec Flair
@@ -350,7 +338,7 @@ class Chatbot:
         self.sauvegarder_historique()
         print(ton)
 '''
-    
+
 
 # --- Partie principale du programme ---
 if __name__ == "__main__":  # Instancie un objet Chatbot et démarre la conversation
