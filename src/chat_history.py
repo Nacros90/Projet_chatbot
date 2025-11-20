@@ -15,13 +15,5 @@ class ChatHistory:
         self.history.append({"timestamp": self._get_timestamp(), "auteur": author, "message": message})
 
     def save(self, prenom):
-        # The original `sauvegarder_historique` function expects an object
-        # with a `.historique` attribute. We can create a temporary object
-        # to satisfy this requirement without changing Save_logs.py.
-        class TempHistoryContainer:
-            pass
-        
-        container = TempHistoryContainer()
-        container.historique = self.history # The original code used 'historique'
-        container.prenom = prenom
-        Save_logs.sauvegarder_historique(container)
+        # Call the modernized save function directly with the history list and the user's name.
+        Save_logs.sauvegarder_historique(self.history, prenom)

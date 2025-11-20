@@ -10,9 +10,12 @@ Ce dépôt contient un prototype de chatbot écrit en Python. L'objectif princip
 
 Le projet fournit une version console du chatbot (fichiers principaux) :
 
-- `Chatbot_main-V2.py` : implémentation principale du chatbot (analyse simple d'humeur, historique, pipeline Transformers pour l'analyse de sentiment).
-- `Chatbot_main-V1.py` : première version plus simple (ancêtre du V2).
-- `Save_logs.py` : utilitaire pour sauvegarder l'historique des conversations.
+- `Chatbot_main-V2.py` : Point d'entrée de l'application. Il gère le déroulement de la conversation.
+- **Dossier `src/`** : Contient tous les modules logiques de l'application :
+  - `chat_history.py` : Classe responsable de la gestion de l'historique de la conversation.
+  - `sentiment_analyzer.py` : Classe qui encapsule toute la logique d'analyse de sentiment (basée sur des règles et via Transformers).
+  - `Save_logs.py` : Utilitaire pour sauvegarder l'historique des conversations dans un fichier.
+- `Chatbot_main-V1.py` : Première version du script, conservée pour archive (ancêtre du V2).
 - dossier `historiques/` : stockage des historiques JSON générés lors des sessions.
 
 **Arborescence (extrait)**
