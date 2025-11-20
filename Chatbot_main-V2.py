@@ -1,16 +1,6 @@
-from datetime import datetime
-import Save_logs  # Importe le module Save_logs pour la sauvegarde de l'historique
-''''
-import nltk
-from nltk.sentiment import SentimentIntensityAnalyzer
-from textblob import Blobber
-from textblob_fr import PatternTagger, PatternAnalyzer
-from flair.models import TextClassifier
-from flair.data import Sentence
-'''
-#TextClassifier.load('sentiment-multi-fast') # Instancie le classificateur de sentiment de Flair
-from transformers import pipeline  # Importe la bibliothèque Transformers pour le traitement du langage naturel
-import torch  # Importe PyTorch, une bibliothèque de calcul scientifique
+from src.chat_history import ChatHistory
+from src.sentiment_analyzer import SentimentAnalyzer
+from src import Save_logs
 
 #print("Chatbot version 2.0")
 # Définition de la classe Chatbot pour encapsuler le comportement du chatbot
@@ -18,8 +8,8 @@ class Chatbot:
     def __init__(self):  # Initialisation des attributs de la classe
         self.prenom = ""  # Stocke le prénom de l'utilisateur
         self.humeur = "neutre"  # Stocke l'humeur du chatbot
-        self.historique=[]
-        #self.sia=SentimentIntensityAnalyzer()  # Instancie l'analyseur de sentiment VADER
+        self.history = ChatHistory()
+        self.analyzer = SentimentAnalyzer()
         self.reponses = {  # Dictionnaire contenant des réponses prédéfinies et leurs variations selon l'humeur
             "aide": {
                 "neutre" : "Que puis-je faire pour toi, {prenom} ?",
@@ -42,57 +32,24 @@ class Chatbot:
                 "enerve": "Qu'est-ce que tu veux encore ?"
             },
         }
-        self.mots_mechants = ["stupide", "idiot", "nul", "con"]  # Liste de mots considérés comme méchants
-        self.mots_positifs = ["bien", "super", "génial", "cool","parfait"]  # Liste de mots considérés comme positifs
-        self.motifs_positifs = [  # Liste de motifs positifs pour la réponse
-            (["je suis","content"],1),
-            (["je me sens","bien"],1),
-            (["je me sens super","bien"],2),
-            (["c'est","super"],2),
-            (["c'est","génial"],2),
-            (["je suis","heureux"],1)
-        ]
-        self.motifs_negatifs = [  # Liste de motifs négatifs pour la réponse
-            (["je suis","triste"],1),
-            (["je me sens","mal"],2),
-            (["c'est","nul"],2),
-            (["c'est","pourri"],1),
-            (["je suis","déçu"],1),
-        ]
-        self.mots_negation=["pas", "ne", "aucun", "jamais","rien"]  # Liste de mots de négation
-        #self.tb=Blobber(pos_tagger=PatternTagger(), analyzer=PatternAnalyzer())  # Instancie l'analyseur de sentiment TextBlob pour le français
-        #self.classifier = TextClassifier.load('sentiment-multi-fast')  # Instancie le classificateur de sentiment de Flair
-        self.sentiment_pipeline = pipeline("sentiment-analysis", model="nlptown/bert-base-multilingual-uncased-sentiment", device=0 if torch.cuda.is_available() else -1)  # Instancie le pipeline de sentiment multilingue de Transformers
-
-    def get_timestamp(self):  # Retourne l'heure actuelle au format "YYYY-MM-DD HH:MM:SS"
-        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     def demander_prenom(self):  # Demande le prénom de l'utilisateur
-        print("Chatbot : Salut ! Comment t'appelles-tu ?")
+        prompt = "Chatbot : Salut ! Comment t'appelles-tu ?"
+        print(prompt)
+        self.history.add_message("Chatbot", prompt)
         self.prenom = input("Toi : ").capitalize()  # Récupère et capitalise le prénom
         if self.prenom.lower() == "quit":  # Si l'utilisateur tape "quit", on quitte le programme
             print("Chatbot : Bye bye !")
             exit()
-        self.historique.append({
-            "timestamp": self.get_timestamp(),
-            "auteur": "Chatbot",
-            "message":"Salut ! Comment t'appelles-tu ?"
-            })
-        self.historique.append({
-            "timestamp": self.get_timestamp(),
-            "auteur": "Utilisateur",
-            "message": self.prenom,
-            })
-        print(f"Chatbot : Enchanté, {self.prenom} ! Tape 'quit' pour quitter la conversation.")
-        self.historique.append({
-            "timestamp": self.get_timestamp(),
-            "auteur": "Chatbot",
-            "message": f"Enchanté, {self.prenom} ! Tape 'quit' pour quitter la conversation."
-            })
+        self.history.add_message("Utilisateur", self.prenom)
+        
+        welcome_message = f"Enchanté, {self.prenom} ! Tape 'quit' pour quitter la conversation."
+        print(f"Chatbot : {welcome_message}")
+        self.history.add_message("Chatbot", welcome_message)
     
     def analyse_humeur(self, message):  # Analyse le message de l'utilisateur pour déterminer son humeur
         message = message.lower()  # Convertit le message en minuscules pour éviter les problèmes de casse
-        for mot in self.mots_mechants:
+        for mot in self.analyzer.mots_mechants:
             if mot in message:
                 self.humeur = "enerve"
                 return
@@ -123,231 +80,36 @@ class Chatbot:
     def discuter(self):  # Boucle principale pour interagir avec l'utilisateur
         while True:
             utilisateur = input(f"{self.prenom} : ")  # Récupère le message de l'utilisateur
-            self.historique.append({  # Enregistre le message de l'utilisateur dans l'historique
-                "timestamp": self.get_timestamp(),
-                "auteur": "Utilisateur",
-                "message": utilisateur
-                })
+            self.history.add_message("Utilisateur", utilisateur)
 
             if utilisateur.lower() == "quit":  # Si l'utilisateur tape "quit", on quitte la boucle
-                print(f"Chatbot : Bye bye, {self.prenom} !")
-                self.historique.append({
-                    "timestamp": self.get_timestamp(),
-                    "auteur": "Chatbot",
-                    "message": f"Bye bye, {self.prenom} !"
-                    })
+                farewell_message = f"Bye bye, {self.prenom} !"
+                print(f"Chatbot : {farewell_message}")
+                self.history.add_message("Chatbot", farewell_message)
                 break
 
             # Obtient une réponse du chatbot et l'affiche
             reponse = self.obtenir_reponse(utilisateur)
             print("Chatbot :", reponse)
-            self.historique.append({
-                "timestamp": self.get_timestamp(),
-                "auteur": "Chatbot",
-                "message": reponse
-                })
+            self.history.add_message("Chatbot", reponse)
 
-    def sauvegarder_historique(self):  # Sauvegarde l'historique de la conversation dans un fichier JSON
-        Save_logs.sauvegarder_historique(self)
+    def final_analysis(self):
+        print("\n--- Analyse de la conversation (Règles) ---")
+        rule_analysis = self.analyzer.analyze_with_rules(self.history.history)
+        print(rule_analysis)
+        self.history.add_message("Analyse_conv_regles", rule_analysis)
 
-    def contient_negation(self, message):  # Vérifie si le message contient des mots de négation
-        return any(neg in message for neg in self.mots_negation)
+        print("\n--- Analyse de la conversation (Transformers) ---")
+        transformer_analysis = self.analyzer.analyze_with_transformers(self.history.history)
+        print(transformer_analysis)
+        self.history.add_message("Analyse_conv_transformers", transformer_analysis)
 
-    def analyser_conversation(self):  # Analyse l'historique de la conversation pour détecter les messages positifs et négatifs
-            positifs = 0
-            negatifs = 0
-
-            for entree in self.historique:
-                if entree["auteur"] == "Utilisateur":
-                    message = entree["message"].lower()
-                    negation=self.contient_negation(message)  # Vérifie si le message contient des mots de négation
-
-                    #Vérification simple de mots isolés
-                    for mot in self.mots_positifs:
-                        if mot in message:
-                            if negation:
-                                negatifs += 1
-                            else:
-                                positifs += 1
-                    
-                    for mot in self.mots_mechants:
-                        if mot in message:
-                            negatifs += 1
-
-                    #Vérification de motifs complexes avec poids
-                    for motif,poids in self.motifs_positifs:  #motifs positifs
-                        if all(mot in message for mot in motif):
-                            if negation:
-                                negatifs += poids
-                            else:
-                                positifs += poids
-                            break #Evite de compter plusieurs fois le même message
-                    
-                    for motif,poids in self.motifs_negatifs:  #motifs négatifs
-                        if all(mot in message for mot in motif):
-                            negatifs += poids
-                            break
-
-            print("\n--- Analyse de la conversation ---")
-            print(f"Messages positifs détectés : {positifs}")
-            print(f"Messages négatifs détectés : {negatifs}")
-
-            if positifs > negatifs:
-                ton="Conclusion : Conversation globalement POSITIVE"
-                print(ton)
-            elif negatifs > positifs:
-                ton="Conclusion : Conversation plutôt NEGATIVE"
-                print(ton)
-            else:
-                ton="Conclusion : Conversation NEUTRE ou équilibrée"
-                print(ton)
-                        
-            self.historique.append({
-                "timestamp": self.get_timestamp(),
-                "auteur": "Analyse_conv",
-                "message": ton
-                })
-
-    def analyser_conversation_transformers(self):  # Analyse l'historique de la conversation avec le modèle Transformers
-        user_messages=[m["message"] for m in self.historique if m["auteur"]=="Utilisateur"]  #filtre les messages de l'utilisateur
-
-        if not user_messages:
-            ton = "Aucun message utilisateur à analyser."
-        else:  #découpe en petits batches pour éviter les erreurs de mémoire
-            batch_size = 16  # Taille du batch
-            scores = []  # Liste pour stocker les scores de sentiment
-
-            for i in range(0, len(user_messages), batch_size):
-                batch = user_messages[i:i + batch_size]
-                results = self.sentiment_pipeline(batch)  # Applique le pipeline de sentiment sur le batch
-
-                for res in results:
-                    score = int(res["label"][0])  # Récupère le score de sentiment
-                    scores.append(score)  # Ajoute le score à la liste
-            
-            moyenne = sum(scores) / len(scores)  # Calcule la moyenne des scores
-            if moyenne >= 4:
-                ton = "Ton globalement positif (Transformers)"
-            elif moyenne <= 2:
-                ton = "Ton globalement négatif (Transformers)"
-            else:
-                ton = "Ton globalement neutre ou incertain (Transformers)"
-        
-        self.historique.append({
-            "timestamp": self.get_timestamp(),
-            "auteur": "Tranformers_conv_analyse",
-            "message": ton,
-            })
-        
-        #Libération de la mémoire GPU si utilisée
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-        print(ton)  # Affiche le ton de la conversation
-
-''' #Analyse l'historique de la conversation avec Flair
-    def analyser_conversation_flair(self):  # Analyse l'historique de la conversation avec Flair
-        pos_count, neg_count = 0, 0
-        nb_messages = 0
-
-        for message in self.historique:
-            if message["auteur"] == "Utilisateur":
-                sentence = Sentence(message["message"])
-                self.classifier.predict(sentence)
-                label = sentence.labels[0].value  # Récupère le label de sentiment
-                if label == "POSITIVE":
-                    pos_count += 1
-                elif label == "NEGATIVE":
-                    neg_count += 1
-                nb_messages += 1
-        
-        if nb_messages == 0:
-            ton = "Aucun message à analyser."
-        else:
-            if pos_count/nb_messages > 0.6:
-                ton = "Ton positif (Flair)"
-            elif neg_count/nb_messages > 0.6:
-                ton = "Ton négatif (Flair)"
-            else:
-                ton = "Ton neutre ou incertain (Flair)"
-        
-        self.historique.append({
-            "timestamp": self.get_timestamp(),
-            "auteur": "Bot",
-            "message": ton,
-            })
-        self.sauvegarder_historique()
-        print(ton)
-'''
-''' #Analyse l'historique de la conversation avec NLP (VADER)
-    def analyser_conversation_nlp(self):
-        score_total = 0
-        nb_messages = 0
-
-        for message in self.historique:
-            if message["auteur"] == "Utilisateur":
-                s = self.sia.polarity_scores(message["message"])
-                score_total += s["compound"]
-                nb_messages += 1
-
-        if nb_messages == 0:
-            ton = "Aucun message à analyser."
-        else:
-            moyenne = score_total / nb_messages
-            if moyenne > 0.3:
-                ton = "Ton positif (NLP)"
-            elif moyenne < -0.3:
-                ton = "Ton négatif (NLP)"
-            else:
-                ton = "Ton neutre ou incertain (NLP)"
-
-        self.historique.append({
-            "auteur": "Bot",
-            "message": ton,
-            "timestamp": self.get_timestamp()
-        })
-        self.sauvegarder_historique()   #Je pense que cette ligne n'est pas nécessaire ici, mais je la laisse pour l'instant
-        print(ton)
-'''
-''' #Analyse l'historique de la conversation avec TextBlob
-    def analyser_conversation_textblob(self):
-        score_total = 0
-        nb_messages = 0
-
-        for message in self.historique:
-            if message["auteur"] == "Utilisateur":
-                blob = self.tb(message["message"])
-                score_total += blob.sentiment[0]  # Utilise TextBlob pour obtenir le score de sentiment
-                nb_messages += 1
-        
-        if nb_messages == 0:
-            ton = "Aucun message à analyser."
-        else:
-            moyenne = score_total / nb_messages
-            if moyenne > 0.3:
-                ton = "Ton positif (TextBlob)"
-            elif moyenne < -0.3:
-                ton = "Ton négatif (TextBlob)"
-            else:
-                ton = "Ton neutre ou incertain (TextBlob)"
-        
-        self.historique.append({
-            "timestamp": self.get_timestamp(),
-            "auteur": "Bot",
-            "message": ton,
-            })
-        self.sauvegarder_historique()
-        print(ton)
-'''
-
+        self.history.save(self.prenom)
 
 # --- Partie principale du programme ---
 if __name__ == "__main__":  # Instancie un objet Chatbot et démarre la conversation
     bot = Chatbot()
     bot.demander_prenom()  # Demande le prénom de l'utilisateur
     bot.discuter()  # Démarre la conversation
-    bot.analyser_conversation()  # Analyse l'historique de la conversation
-    #bot.analyser_conversation_nlp()  # Analyse l'historique de la conversation avec NLP, fonctionne que en anglais
-    #bot.analyser_conversation_textblob()  # Analyse l'historique de la conversation avec TextBlob
-    #bot.analyser_conversation_flair()  # Analyse l'historique de la conversation avec Flair
-    bot.analyser_conversation_transformers()  # Analyse l'historique de la conversation avec Transformers
-    bot.sauvegarder_historique()  # Sauvegarde l'historique de la conversation dans un fichier JSON
+
+    bot.final_analysis()
