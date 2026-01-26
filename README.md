@@ -93,14 +93,3 @@ N'hésitez pas à proposer des améliorations :
 - Tests et gestion des erreurs
 
 Créez une issue ou une pull request pour que nous puissions en discuter.
-
-**Licence**
-
-Licence : à définir (par défaut, demandez au propriétaire du dépôt).
-
----
-
-Si vous voulez, je peux :
-
-- Générer un `requirements.txt` basé sur les imports actuels.
-- Ajouter un exemple minimal d'appel API pour Gemini (squelette).
