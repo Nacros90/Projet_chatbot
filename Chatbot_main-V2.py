@@ -1,6 +1,7 @@
 from src.chat_history import ChatHistory
 from src.sentiment_analyzer import SentimentAnalyzer
 from src import Save_logs
+from src.IA_client import IAClient
 
 #print("Chatbot version 2.0")
 # Définition de la classe Chatbot pour encapsuler le comportement du chatbot
@@ -32,6 +33,7 @@ class Chatbot:
                 "enerve": "Qu'est-ce que tu veux encore ?"
             },
         }
+        self.ia_brain = IAClient()
 
     def demander_prenom(self):  # Demande le prénom de l'utilisateur
         prompt = "Chatbot : Salut ! Comment t'appelles-tu ?"
@@ -111,5 +113,4 @@ if __name__ == "__main__":  # Instancie un objet Chatbot et démarre la conversa
     bot = Chatbot()
     bot.demander_prenom()  # Demande le prénom de l'utilisateur
     bot.discuter()  # Démarre la conversation
-
     bot.final_analysis()
