@@ -21,7 +21,7 @@ class IAClient:
             self.client = genai.Client(api_key=api_key)
             
             # On crée une session de chat pour garder la mémoire
-            self.chat_session = self.client.chats.create(model="gemini-1.5-flash-001")
+            self.chat_session = self.client.chats.create(model="gemini-1.5-pro-001")
             
             self.est_actif = True
             print("[IA] Cerveau connecté (Nouvelle version) !")
