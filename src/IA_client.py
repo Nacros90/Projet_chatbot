@@ -17,7 +17,7 @@ class IAClient:
             return
         try:
             genai.configure(api_key=api_key)
-            self.model = genai.GenerativeModel('gemini-pro')
+            self.model = genai.GenerativeModel('gemini-1.5-flash')
             self.chat_session = self.model.start_chat(history=[])
             self.est_actif = True
             print("[Info IA] Connexion à l'IA Gemini réussie.")
