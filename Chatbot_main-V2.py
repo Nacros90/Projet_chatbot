@@ -11,6 +11,11 @@ class Chatbot:
         self.humeur = "neutre"  # Stocke l'humeur du chatbot
         self.history = ChatHistory()
         self.analyzer = SentimentAnalyzer()
+
+        #Initialisation de l'IA
+        print("Initialisation du système IA...")
+        self.ia_brain = IAClient()
+
         self.reponses = {  # Dictionnaire contenant des réponses prédéfinies et leurs variations selon l'humeur
             "aide": {
                 "neutre" : "Que puis-je faire pour toi, {prenom} ?",
@@ -33,7 +38,6 @@ class Chatbot:
                 "enerve": "Qu'est-ce que tu veux encore ?"
             },
         }
-        self.ia_brain = IAClient()
 
     def demander_prenom(self):  # Demande le prénom de l'utilisateur
         prompt = "Chatbot : Salut ! Comment t'appelles-tu ?"
@@ -62,6 +66,7 @@ class Chatbot:
         message = message.lower()  # Convertit le message en minuscules pour simplifier la recherche
         self.analyse_humeur(message)  # Analyse l'humeur de l'utilisateur
         
+        #1. Réponse scriptée proiritaire
         # Vérifie si le message contient "bonjour"
         if "bonjour" in message:
             salutation={
@@ -76,8 +81,9 @@ class Chatbot:
             if mot_cle in message:  # Si un mot-clé est trouvé dans le message
                 return self.reponses[mot_cle][self.humeur].format(prenom=self.prenom)  # Retourne la réponse formatée selon l'humeur
 
-        # Si aucun mot-clé n'est trouvé, retourne une réponse par défaut
-        return f"Hmm, je n'ai pas compris, {self.prenom}..."
+        # Si aucun mot-clé n'est trouvé, on utilise l'IA pour générer une réponse
+        print(">>> Soumission de la requête à l'IA...")
+        return self.ia_brain.generer_reponse(message, self.prenom)
 
     def discuter(self):  # Boucle principale pour interagir avec l'utilisateur
         while True:
@@ -101,6 +107,7 @@ class Chatbot:
         print(rule_analysis)
         self.history.add_message("Analyse_conv_regles", rule_analysis)
 
+        # Optionnel : On peut désactiver l'analyse Transformers si trop lent ou lourd
         print("\n--- Analyse de la conversation (Transformers) ---")
         transformer_analysis = self.analyzer.analyze_with_transformers(self.history.history)
         print(transformer_analysis)
