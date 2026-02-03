@@ -1,28 +1,32 @@
-import google.generativeai as genai
+from google import genai
 import os
 from dotenv import load_dotenv
 
 class IAClient:
     """
-    Gère la communication avec le modèle de langage (LLM) Gemini.
+    Gère la communication avec l'IA via la nouvelle bibliothèque google-genai.
     """
     def __init__(self):
-        #Chargement de la clé API depuis les variables d'environnement
+        # Charge les variables du fichier .env
         load_dotenv()
         api_key = os.getenv("GEMINI_API_KEY")
 
         if not api_key:
-            print("[Erreur IA] Clé API Gemini non trouvée dans les variables d'environnement. Vérifiez votre fichier .env.")
+            print("[Erreur IA] Clé API non trouvée dans .env")
             self.est_actif = False
             return
+
         try:
-            genai.configure(api_key=api_key)
-            self.model = genai.GenerativeModel('gemini-1.5-flash')
-            self.chat_session = self.model.start_chat(history=[])
+            # Connexion avec la nouvelle syntaxe
+            self.client = genai.Client(api_key=api_key)
+            
+            # On crée une session de chat pour garder la mémoire
+            self.chat_session = self.client.chats.create(model="gemini-1.5-flash")
+            
             self.est_actif = True
-            print("[Info IA] Connexion à l'IA Gemini réussie.")
+            print("[IA] Cerveau connecté (Nouvelle version) !")
         except Exception as e:
-            print(f"[Erreur IA] Impossible de démarrer l'IA : {e}")
+            print(f"[Erreur IA] Impossible de démarrer : {e}")
             self.est_actif = False
 
     def generer_reponse(self, message_utilisateur, prenom_utilisateur=""):
@@ -30,14 +34,14 @@ class IAClient:
         Envoie le message à l'IA et récupère la réponse.
         """
         if not self.est_actif:
-            return "Désolé, mon cerveau d'IA n'est pas connecté."
+            return "Désolé, mon cerveau est déconnecté."
 
         try:
-            # On peut ajouter du contexte pour que l'IA sache à qui elle parle
+            # On ajoute le contexte (prénom) de manière subtile
             contexte = f"(L'utilisateur s'appelle {prenom_utilisateur}). "
             
-            # Envoi du message
+            # Envoi du message via la nouvelle méthode
             response = self.chat_session.send_message(contexte + message_utilisateur)
             return response.text
         except Exception as e:
-            return f"Oups, j'ai eu un mal de tête (Erreur API) : {e}"
+            return f"Oups, petite erreur technique : {e}"
