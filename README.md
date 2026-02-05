@@ -16,6 +16,7 @@ Le projet fournit une version console du chatbot (fichiers principaux) :
   - `sentiment_analyzer.py` : Analyse le sentiment des messages (basé sur des règles simples). La partie utilisant Transformers est actuellement désactivée.
 - `Chatbot_main-V1.py` : Première version du script, conservée pour archive (ancêtre du V2).
 - `check_models.py` : Script utilitaire pour vérifier la clé API Gemini et lister les modèles disponibles.
+- `requirements.txt` : Fichier listant les dépendances du projet.
 - dossier `historiques/` : stockage des historiques JSON générés lors des sessions.
 
 **Arborescence (simplifiée)**
@@ -43,6 +44,7 @@ python -m venv .venv
 pip install -U pip
 pip install transformers torch
 # Pour GPU et versions spécifiques de PyTorch, suivez les instructions officielles PyTorch
++pip install -r requirements.txt
 ```
 
 Remarque : il est recommandé d'ajouter un fichier `requirements.txt` pour figer les versions. Si vous utilisez CUDA/GPU, installez PyTorch selon la documentation officielle pour Windows.
