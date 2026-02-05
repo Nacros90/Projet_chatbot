@@ -1,24 +1,24 @@
 
 # Projet Chatbot — Prototype
 
-Ce dépôt contient un prototype de chatbot écrit en Python. L'objectif principal est d'avoir une base simple de conversation et d'analyse de ton, puis d'évoluer vers une "vraie IA" :
+Ce dépôt contient un prototype de chatbot en console écrit en Python. L'objectif principal est d'avoir une base de conversation simple, capable d'analyser le ton, et d'utiliser une IA externe pour des réponses plus dynamiques.
 
-- intégration d'une API (ex. Gemini) pour la version cloud
-- version autonome utilisant un modèle de langage local
+Le projet intègre l'API **Gemini de Google** pour la génération de réponses lorsque le script ne trouve pas de correspondance prédéfinie.
 
 **État actuel**
 
 Le projet fournit une version console du chatbot (fichiers principaux) :
 
 - `Chatbot_main-V2.py` : Point d'entrée de l'application. Il gère le déroulement de la conversation.
-- **Dossier `src/`** : Contient tous les modules logiques de l'application :
-  - `chat_history.py` : Classe responsable de la gestion de l'historique de la conversation.
-  - `sentiment_analyzer.py` : Classe qui encapsule toute la logique d'analyse de sentiment (basée sur des règles et via Transformers).
-  - `Save_logs.py` : Utilitaire pour sauvegarder l'historique des conversations dans un fichier.
+- **Dossier `src/`** : Contient les modules logiques de l'application :
+  - `IA_client.py` : Gère la communication avec l'API Gemini de Google.
+  - `chat_history.py` : Gère l'historique de la conversation et sa sauvegarde en fichier JSON.
+  - `sentiment_analyzer.py` : Analyse le sentiment des messages (basé sur des règles simples). La partie utilisant Transformers est actuellement désactivée.
 - `Chatbot_main-V1.py` : Première version du script, conservée pour archive (ancêtre du V2).
+- `check_models.py` : Script utilitaire pour vérifier la clé API Gemini et lister les modèles disponibles.
 - dossier `historiques/` : stockage des historiques JSON générés lors des sessions.
 
-**Arborescence (extrait)**
+**Arborescence (simplifiée)**
 
 ```
 Chatbot_main-V2.py
@@ -66,6 +66,7 @@ Comportement attendu : le bot demande votre prénom, puis entre en boucle de con
 - Gestion simple d'humeur (positif / négatif / énervé) à partir de mots-clés et motifs.
 - Analyse de conversation basique (comptage de mots positifs/négatifs).
 - Pipeline Transformers (`nlptown/bert-base-multilingual-uncased-sentiment`) pour une analyse plus avancée (option GPU si disponible).
+	- Note : L'analyse de sentiment avancée via Transformers est présente dans le code mais désactivée par défaut.
 
 **Roadmap / Projets futurs**
 
