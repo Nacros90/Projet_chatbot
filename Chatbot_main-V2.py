@@ -1,9 +1,8 @@
 from src.chat_history import ChatHistory
 from src.sentiment_analyzer import SentimentAnalyzer
-from src import Save_logs
 from src.IA_client import IAClient
+import sys
 
-#print("Chatbot version 2.0")
 # Définition de la classe Chatbot pour encapsuler le comportement du chatbot
 class Chatbot:
     def __init__(self):  # Initialisation des attributs de la classe
@@ -44,11 +43,13 @@ class Chatbot:
         print(prompt)
         self.history.add_message("Chatbot", prompt)
         self.prenom = input("Toi : ").capitalize()  # Récupère et capitalise le prénom
+        if not self.prenom:
+            self.prenom = "Utilisateur"  # Valeur par défaut si aucun prénom n'est donné
         if self.prenom.lower() == "quit":  # Si l'utilisateur tape "quit", on quitte le programme
             print("Chatbot : Bye bye !")
-            exit()
-        self.history.add_message("Utilisateur", self.prenom)
+            sys.exit()
         
+        self.history.add_message("Utilisateur", self.prenom)
         welcome_message = f"Enchanté, {self.prenom} ! Tape 'quit' pour quitter la conversation."
         print(f"Chatbot : {welcome_message}")
         self.history.add_message("Chatbot", welcome_message)
@@ -108,10 +109,12 @@ class Chatbot:
         self.history.add_message("Analyse_conv_regles", rule_analysis)
 
         # Optionnel : On peut désactiver l'analyse Transformers si trop lent ou lourd
-        print("\n--- Analyse de la conversation (Transformers) ---")
-        transformer_analysis = self.analyzer.analyze_with_transformers(self.history.history)
-        print(transformer_analysis)
-        self.history.add_message("Analyse_conv_transformers", transformer_analysis)
+        if self.analyzer.use_transformers:
+            print("   (Lancement de l'analyse neuronale...)")
+            neural = self.analyzer.analyze_with_transformers(self.history.history)
+            print(f"2. Analyse Neuronale (IA Locale) : {neural}")
+        else:
+            print("2. Analyse Neuronale : Non disponible (Module non installé).")
 
         self.history.save(self.prenom)
 
