@@ -1,19 +1,20 @@
 
 # Projet Chatbot — Prototype
 
-Ce dépôt contient un prototype de chatbot en console écrit en Python. L'objectif principal est d'avoir une base de conversation simple, capable d'analyser le ton, et d'utiliser une IA externe pour des réponses plus dynamiques.
+Ce dépôt contient un prototype de chatbot en console écrit en Python. L'objectif est de fournir une base de conversation simple, capable d'analyser le ton, et d'utiliser une IA externe pour des réponses dynamiques et contextuelles.
 
-Le projet intègre l'API **Gemini de Google** pour la génération de réponses lorsque le script ne trouve pas de correspondance prédéfinie.
+Le projet intègre l'API **Gemini de Google** pour générer des réponses lorsque le script ne trouve pas de correspondance prédéfinie. La personnalité et le comportement de l'IA sont configurables via un fichier d'instructions dédié.
 
 **État actuel**
 
 Le projet fournit une version console du chatbot (fichiers principaux) :
 
 - `Chatbot_main-V2.py` : Point d'entrée de l'application. Il gère le déroulement de la conversation.
-- **Dossier `src/`** : Contient les modules logiques de l'application :
-  - `IA_client.py` : Gère la communication avec l'API Gemini de Google.
+- **Dossier `src/`** : Contient les modules principaux :
+  - `IA_client.py` : Gère la communication avec l'API Gemini, incluant la gestion du contexte de la session.
   - `chat_history.py` : Gère l'historique de la conversation et sa sauvegarde en fichier JSON.
   - `sentiment_analyzer.py` : Analyse le sentiment des messages (basé sur des règles simples). La partie utilisant Transformers est actuellement désactivée.
+  - `bot_identity.py` : Fichier de configuration contenant les instructions système (persona, ton, règles) pour l'IA.
 - `Chatbot_main-V1.py` : Première version du script, conservée pour archive (ancêtre du V2).
 - `check_models.py` : Script utilitaire pour vérifier la clé API Gemini et lister les modèles disponibles.
 - `requirements.txt` : Fichier listant les dépendances du projet.

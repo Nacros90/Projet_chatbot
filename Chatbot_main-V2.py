@@ -1,6 +1,7 @@
 from src.chat_history import ChatHistory
 from src.sentiment_analyzer import SentimentAnalyzer
 from src.IA_client import IAClient
+from src.bot_identity import identity_prompt
 import sys
 
 # Définition de la classe Chatbot pour encapsuler le comportement du chatbot
@@ -11,6 +12,9 @@ class Chatbot:
         self.history = ChatHistory()
         self.analyzer = SentimentAnalyzer()
 
+        print("Initialisation de l'identité du chatbot...")
+        self.ia_brain = IAClient(system_instructions=identity_prompt)  # On passe les instructions système à l'IA
+        
         #Initialisation de l'IA
         print("Initialisation du système IA...")
         self.ia_brain = IAClient()
