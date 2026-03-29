@@ -58,23 +58,22 @@ Lancer la version principale :
 python Chatbot_main-V2.py
 ```
 
-Comportement attendu : le bot demande votre prénom, puis entre en boucle de conversation. Tapez `quit` pour terminer la session. L'historique est collecté et peut être sauvegardé via la fonction `sauvegarder_historique()` (implémentée dans `Save_logs.py`).
+Comportement attendu : le bot demande votre prénom, puis entre en boucle de conversation. Tapez `quit` pour terminer la session. L'historique de la conversation et l'analyse des sentiments seront générés et sauvegardés à la fin.
 
 **Logs et historiques**
 
-- Les échanges sont stockés en mémoire pendant la session dans `bot.historique` et peuvent être sauvegardés dans le dossier `historiques/` au format JSON via `Save_logs.sauvegarder_historique`.
+- Les échanges sont stockés en mémoire pendant la session et sauvegardés automatiquement dans le dossier `historiques/` au format JSON à la fin de l'exécution via la classe `ChatHistory`.
 
 **Fonctionnalités implémentées**
 
-- Gestion simple d'humeur (positif / négatif / énervé) à partir de mots-clés et motifs.
 - Analyse de conversation basique (comptage de mots positifs/négatifs).
 - Pipeline Transformers (`nlptown/bert-base-multilingual-uncased-sentiment`) pour une analyse plus avancée (option GPU si disponible).
 	- Note : L'analyse de sentiment avancée via Transformers est présente dans le code mais désactivée par défaut.
 
 **Roadmap / Projets futurs**
 
-1. Intégration d'une API externe (ex. Gemini) :
-	- Créer une version qui envoie les messages à une API cloud (authentification, quotas, latence, sécurité).
+1. Amélioration de l'API externe (Gemini) :
+	- L'API Gemini est intégrée, mais on peut ajouter le mode "Streaming" pour afficher les réponses en temps réel.
 	- Ajouter gestion des appels asynchrones et file d'attente.
 
 2. Version locale avec LLM :
