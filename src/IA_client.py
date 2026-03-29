@@ -1,68 +1,68 @@
 from google import genai
+from google.genai import types # <-- Nouvel import pour la configuration
 import os
-from dotenv import load_dotenv
 import time
+from dotenv import load_dotenv
 
 class IAClient:
     """
-    Gère la communication avec l'IA via la nouvelle bibliothèque google-genai.
+    Client IA robuste avec intégration native du System Prompt.
     """
-    def __init__(self, system_instructions=None):
-        # Charge les variables du fichier .env
+    def __init__(self, system_instruction=None):
         load_dotenv()
         api_key = os.getenv("GEMINI_API_KEY")
         self.est_actif = False
-
-        #On stocke les instructions système pour les envoyer à chaque requête (si besoin)
-        self.system_instructions = system_instructions
-        
+        # --- DEBUG ---
+        if system_instruction:
+            print("[DEBUG] Le cerveau a bien reçu une identité !")
+        else:
+            print("[DEBUG] ATTENTION : Le cerveau n'a reçu AUCUNE identité (system_instruction est vide).")
+        # --------------------------------------------
         if not api_key:
-            print("[Erreur IA] Clé API non trouvée dans .env")
-            self.est_actif = False
+            print("[IA] Clé API manquante dans le fichier .env")
             return
 
         try:
-            # Connexion avec la nouvelle syntaxe
             self.client = genai.Client(api_key=api_key)
-            # On crée une session de chat pour garder la mémoire
-            self.chat_session = self.client.chats.create(model="gemini-flash-latest")
+            
+            # 1. On prépare la configuration "Système" officielle
+            config_ia = None
+            if system_instruction:
+                config_ia = types.GenerateContentConfig(
+                    system_instruction=system_instruction,
+                    temperature=0.7 # Optionnel : Règle la créativité (0.0 = robotique, 1.0 = très créatif)
+                )
+            
+            # 2. On crée le chat en lui injectant la configuration dès le départ
+            self.chat_session = self.client.chats.create(
+                model="gemini-flash-latest",
+                config=config_ia
+            )
+            
             self.est_actif = True
-            print("[IA] Cerveau connecté (Nouvelle version) !")
-        
+            print("[IA] Cerveau connecté (Identité chargée avec succès) !")
         except Exception as e:
-            print(f"[Erreur IA] Impossible de démarrer : {e}")
-            self.est_actif = False
+            print(f"[IA] Erreur critique au démarrage : {e}")
 
     def generer_reponse(self, message_utilisateur, prenom_utilisateur=""):
-        """
-        Envoie le message à l'IA et récupère la réponse.
-        """
         if not self.est_actif:
-            return "Désolé, l'IA est hors ligne pour le moment."
-        
-        #On combine les instructions système avec le message de l'utilisateur pour donner plus de contexte à l'IA
-        contexte_global=""
-        # 1. On ajoute l'identité si elle existe
-        if self.system_instructions:
-            contexte_global += f"{self.system_instructions}\n\n"
-        
-        # 2. On ajoute le contexte dynamique (Prénom, etc.)
-        contexte_global += f"(Info contexte : L'utilisateur s'appelle {prenom_utilisateur}).\n"
-        
-        # 3. Le message réel
-        prompt_final = contexte_global + "Message utilisateur : " + message_utilisateur
+            return "Désolé, je suis en mode hors-ligne."
+
+        # Plus besoin de répéter l'énorme prompt d'identité à chaque fois !
+        # On glisse juste le prénom de l'utilisateur discrètement.
+        message_enrichi = f"(Info : L'utilisateur s'appelle {prenom_utilisateur}) {message_utilisateur}"
 
         tentatives_max = 3
         for i in range(tentatives_max):
             try:
-                # On envoie le tout. L'utilisateur ne voit pas le prompt système, 
-                # mais l'IA le reçoit à chaque fois pour rester "dans le personnage".
-                response = self.chat_session.send_message(prompt_final)
+                # Envoi du message allégé
+                response = self.chat_session.send_message(message_enrichi)
                 return response.text
             except Exception as e:
                 if i == tentatives_max - 1:
                     return f"Je n'arrive pas à joindre mes serveurs. Erreur : {e}"
-                print(f"   (Oups, délai réseau... Je réessaie {i+1}/{tentatives_max})")
+                
+                print(f"   (Oups, petit délai réseau... Je réessaie {i+1}/{tentatives_max})")
                 time.sleep(2)
 """
         try:

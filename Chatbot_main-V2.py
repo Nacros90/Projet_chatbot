@@ -13,12 +13,8 @@ class Chatbot:
         self.analyzer = SentimentAnalyzer()
 
         print("Initialisation de l'identité du chatbot...")
-        self.ia_brain = IAClient(system_instructions=identity_prompt)  # On passe les instructions système à l'IA
-        
-        #Initialisation de l'IA
-        print("Initialisation du système IA...")
-        self.ia_brain = IAClient()
-
+        self.ia_brain = IAClient(system_instruction=identity_prompt)  # On passe les instructions système à l'IA
+ 
         self.reponses = {  # Dictionnaire contenant des réponses prédéfinies et leurs variations selon l'humeur
             "aide": {
                 "neutre" : "Que puis-je faire pour toi, {prenom} ?",
